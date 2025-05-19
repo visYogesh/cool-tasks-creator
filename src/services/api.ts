@@ -12,6 +12,7 @@ export interface Todo {
   dueDate?: string;
 }
 
+// Update this URL to your hosted backend server address
 const API_URL = "https://todoback-vcgb.onrender.com";
 
 // Get all todos
