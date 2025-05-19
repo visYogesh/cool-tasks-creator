@@ -47,11 +47,28 @@ export const TodoItem = ({
     high: "bg-red-500",
   };
 
+  // Using a fixed border color instead of dynamic string template
+  const getBorderClass = () => {
+    if (todo.completed) {
+      return "border-green-500";
+    }
+    
+    if (todo.priority === "low") {
+      return "border-blue-500";
+    } else if (todo.priority === "medium") {
+      return "border-amber-500";
+    } else if (todo.priority === "high") {
+      return "border-red-500";
+    }
+    
+    return "border-gray-300";
+  };
+
   return (
     <Card
       className={cn(
         "transform transition-all duration-300 hover:shadow-lg border-l-4",
-        todo.completed ? "opacity-70 border-green-500" : `border-${priorityColors[todo.priority].replace('bg-', '')}`
+        getBorderClass()
       )}
     >
       {isEditing ? (

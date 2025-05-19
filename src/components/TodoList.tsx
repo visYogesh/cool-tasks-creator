@@ -110,9 +110,8 @@ export const TodoList = ({
             <Select
               value={filterCategory}
               onValueChange={(value) => setFilterCategory(value)}
-              className="col-span-1 md:col-span-2"
             >
-              <SelectTrigger>
+              <SelectTrigger className="col-span-1 md:col-span-2">
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>

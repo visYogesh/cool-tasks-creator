@@ -3,11 +3,12 @@ import { toast } from "sonner";
 
 // Todo interface to type our data
 export interface Todo {
-  id: string;
+  id: string | number;
   title: string;
+  task?: string;
   description?: string;
   completed: boolean;
-  priority: 'low' | 'medium' | 'high';
+  priority?: 'low' | 'medium' | 'high';
   category?: string;
   dueDate?: string;
 }
@@ -22,7 +23,18 @@ export const fetchTodos = async (): Promise<Todo[]> => {
     if (!response.ok) {
       throw new Error("Failed to fetch todos");
     }
-    return await response.json();
+    const data = await response.json();
+    
+    // Transform the data to match our Todo interface
+    return data.map((item: any) => ({
+      id: item.id,
+      title: item.task || item.title || "Untitled task", // Map task to title if available
+      description: item.description || "",
+      completed: item.completed || false,
+      priority: item.priority || "medium", 
+      category: item.category || "",
+      dueDate: item.dueDate || ""
+    }));
   } catch (error) {
     console.error("Error fetching todos:", error);
     toast.error("Could not load your tasks");
@@ -38,12 +50,29 @@ export const createTodo = async (todo: Omit<Todo, "id">): Promise<Todo | null> =
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(todo),
+      body: JSON.stringify({
+        task: todo.title, // Map title to task for backend
+        completed: todo.completed,
+        priority: todo.priority || "medium",
+        description: todo.description,
+        category: todo.category,
+        dueDate: todo.dueDate
+      }),
     });
     if (!response.ok) {
       throw new Error("Failed to create todo");
     }
-    return await response.json();
+    const data = await response.json();
+    // Transform the response to match our Todo interface
+    return {
+      id: data.id,
+      title: data.task || data.title || "Untitled task",
+      description: data.description,
+      completed: data.completed || false,
+      priority: data.priority || "medium",
+      category: data.category,
+      dueDate: data.dueDate
+    };
   } catch (error) {
     console.error("Error creating todo:", error);
     toast.error("Could not create task");
@@ -59,12 +88,29 @@ export const updateTodo = async (todo: Todo): Promise<Todo | null> => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(todo),
+      body: JSON.stringify({
+        task: todo.title, // Map title to task for backend
+        completed: todo.completed,
+        priority: todo.priority || "medium",
+        description: todo.description,
+        category: todo.category,
+        dueDate: todo.dueDate
+      }),
     });
     if (!response.ok) {
       throw new Error("Failed to update todo");
     }
-    return await response.json();
+    const data = await response.json();
+    // Transform the response to match our Todo interface
+    return {
+      id: data.id,
+      title: data.task || data.title || "Untitled task",
+      description: data.description,
+      completed: data.completed || false,
+      priority: data.priority || "medium",
+      category: data.category,
+      dueDate: data.dueDate
+    };
   } catch (error) {
     console.error("Error updating todo:", error);
     toast.error("Could not update task");
