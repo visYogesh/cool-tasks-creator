@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Check, Edit, Trash2, Clock } from "lucide-react";
+import { Check, Edit, Trash2, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Todo } from "@/services/api";
 import { Button } from "@/components/ui/button";
@@ -19,10 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { format } from "date-fns";
 
 interface TodoItemProps {
   todo: Todo;
-  onDelete: (id: string) => void;
+  onDelete: (id: string | number) => void;
   onUpdate: (todo: Todo) => void;
   onToggleComplete: (todo: Todo) => void;
 }
@@ -64,6 +65,18 @@ export const TodoItem = ({
     return "border-gray-300";
   };
 
+  // Format date for display
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return null;
+    try {
+      const date = new Date(dateString);
+      return format(date, "MMM dd, yyyy");
+    } catch (error) {
+      console.error("Invalid date format:", dateString);
+      return null;
+    }
+  };
+
   return (
     <Card
       className={cn(
@@ -91,7 +104,7 @@ export const TodoItem = ({
           />
           <div className="flex flex-col gap-3 sm:flex-row">
             <Select
-              value={editedTodo.priority}
+              value={editedTodo.priority || "medium"}
               onValueChange={(value: "low" | "medium" | "high") =>
                 setEditedTodo({ ...editedTodo, priority: value })
               }
@@ -159,12 +172,12 @@ export const TodoItem = ({
               <div className="flex items-center gap-2">
                 {todo.dueDate && (
                   <div className="flex items-center text-gray-500 text-xs">
-                    <Clock className="h-3 w-3 mr-1" />
-                    {new Date(todo.dueDate).toLocaleDateString()}
+                    <Calendar className="h-3 w-3 mr-1" />
+                    {formatDate(todo.dueDate)}
                   </div>
                 )}
-                <Badge className={priorityColors[todo.priority]}>
-                  {todo.priority}
+                <Badge className={priorityColors[todo.priority || "medium"]}>
+                  {todo.priority || "medium"}
                 </Badge>
                 {todo.category && (
                   <Badge variant="outline">{todo.category}</Badge>

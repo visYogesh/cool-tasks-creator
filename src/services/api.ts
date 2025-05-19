@@ -28,7 +28,7 @@ export const fetchTodos = async (): Promise<Todo[]> => {
     // Transform the data to match our Todo interface
     return data.map((item: any) => ({
       id: item.id,
-      title: item.task || item.title || "Untitled task", // Map task to title if available
+      title: item.task || item.title || "Untitled task", 
       description: item.description || "",
       completed: item.completed || false,
       priority: item.priority || "medium", 
@@ -45,33 +45,39 @@ export const fetchTodos = async (): Promise<Todo[]> => {
 // Create a new todo
 export const createTodo = async (todo: Omit<Todo, "id">): Promise<Todo | null> => {
   try {
+    // Ensure priority is explicitly set to prevent defaults overriding user selection
+    const priority = todo.priority || "medium";
+    
     const response = await fetch(`${API_URL}/todos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        task: todo.title, // Map title to task for backend
+        task: todo.title,
         completed: todo.completed,
-        priority: todo.priority || "medium",
+        priority: priority,
         description: todo.description,
         category: todo.category,
         dueDate: todo.dueDate
       }),
     });
+    
     if (!response.ok) {
       throw new Error("Failed to create todo");
     }
+    
     const data = await response.json();
-    // Transform the response to match our Todo interface
+    
+    // Ensure we use the priority that was sent in the request
     return {
       id: data.id,
       title: data.task || data.title || "Untitled task",
-      description: data.description,
+      description: data.description || "",
       completed: data.completed || false,
-      priority: data.priority || "medium",
-      category: data.category,
-      dueDate: data.dueDate
+      priority: data.priority || priority, // Use original priority if not returned
+      category: data.category || "",
+      dueDate: data.dueDate || ""
     };
   } catch (error) {
     console.error("Error creating todo:", error);
@@ -83,33 +89,39 @@ export const createTodo = async (todo: Omit<Todo, "id">): Promise<Todo | null> =
 // Update an existing todo
 export const updateTodo = async (todo: Todo): Promise<Todo | null> => {
   try {
+    // Ensure priority is explicitly set to prevent defaults overriding user selection
+    const priority = todo.priority || "medium";
+    
     const response = await fetch(`${API_URL}/todos/${todo.id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        task: todo.title, // Map title to task for backend
+        task: todo.title,
         completed: todo.completed,
-        priority: todo.priority || "medium",
+        priority: priority,
         description: todo.description,
         category: todo.category,
         dueDate: todo.dueDate
       }),
     });
+    
     if (!response.ok) {
       throw new Error("Failed to update todo");
     }
+    
     const data = await response.json();
-    // Transform the response to match our Todo interface
+    
+    // Ensure we use the priority that was sent in the request
     return {
       id: data.id,
       title: data.task || data.title || "Untitled task",
-      description: data.description,
+      description: data.description || "",
       completed: data.completed || false,
-      priority: data.priority || "medium",
-      category: data.category,
-      dueDate: data.dueDate
+      priority: data.priority || priority, // Use original priority if not returned
+      category: data.category || "",
+      dueDate: data.dueDate || ""
     };
   } catch (error) {
     console.error("Error updating todo:", error);
@@ -119,7 +131,7 @@ export const updateTodo = async (todo: Todo): Promise<Todo | null> => {
 };
 
 // Delete a todo
-export const deleteTodo = async (id: string): Promise<boolean> => {
+export const deleteTodo = async (id: string | number): Promise<boolean> => {
   try {
     const response = await fetch(`${API_URL}/todos/${id}`, {
       method: "DELETE",
