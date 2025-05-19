@@ -12,7 +12,7 @@ export interface Todo {
   dueDate?: string;
 }
 
-const API_URL = "http://localhost:5000";
+const API_URL = "https://todoback-vcgb.onrender.com";
 
 // Get all todos
 export const fetchTodos = async (): Promise<Todo[]> => {
